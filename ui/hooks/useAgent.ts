@@ -3,20 +3,21 @@ import { useState, useEffect, useRef } from 'react';
 export const useAgent = () => {
   const [messages, setMessages] = useState<{ role: 'user' | 'agent'; content: string }[]>([]);
   const [status, setStatus] = useState('System Ready');
-  const [isLoading, setIsLoading] = useState(false); // New state to lock requests
+  const [isLoading, setIsLoading] = useState(false);
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    // Connect to your FastAPI server
     ws.current = new WebSocket('ws://localhost:8000/ws/query');
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.step === 'done') {
-        setStatus('Analysis Complete');
         setMessages((prev) => [...prev, { role: 'agent', content: data.response }]);
-        setIsLoading(false); // Unlock when synthesis is done
+        setIsLoading(false);
+        setStatus('Ready');
       } else {
-        setStatus(data.status);
+        setStatus(data.status); // Updates status for Analytical Swarm
       }
     };
 
@@ -24,19 +25,20 @@ export const useAgent = () => {
   }, []);
 
   const sendText = (text: string) => {
-    if (isLoading || !text) return; // Prevent new request if busy
+    if (isLoading || !text) return;
     setIsLoading(true);
     setMessages((prev) => [...prev, { role: 'user', content: text }]);
     ws.current?.send(JSON.stringify({ text }));
   };
 
   const sendVoice = async (audioBlob: Blob) => {
-    if (isLoading) return; // Prevent voice upload if already processing
+    if (isLoading) return;
     setIsLoading(true);
-    setStatus('Transcribing Voice...');
-    
+    setStatus('Transcribing...');
+
     const formData = new FormData();
-    formData.append('file', audioBlob, 'voice_query.wav');
+    // We send it as a webm (browser default) but keep the filename for the backend
+    formData.append('file', audioBlob, 'voice_query.webm');
 
     try {
       const res = await fetch('http://localhost:8000/api/v1/query/voice', {
@@ -50,11 +52,11 @@ export const useAgent = () => {
         { role: 'user', content: `🎤 ${result.transcription}` },
         { role: 'agent', content: result.response }
       ]);
-    } catch (error) {
-      setStatus('System Error');
+    } catch (e) {
+      setStatus('Voice Error');
     } finally {
-      setIsLoading(false); // Unlock after synthesis & delivery
-      setStatus('System Ready');
+      setIsLoading(false);
+      setStatus('Ready');
     }
   };
 
