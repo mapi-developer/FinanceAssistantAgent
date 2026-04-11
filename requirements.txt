@@ -3,3 +3,4 @@ sounddvice
 scipy
 requests
 python-dotenv
+google-adk

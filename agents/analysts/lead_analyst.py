@@ -10,24 +10,16 @@ from local_llama import query_local_llama
 # A2A (Agent-to-Agent) Delegation Stubs
 # These will be replaced by actual calls to the specialized agents
 # -------------------------------------------------------------------
+from agents.analysts.market import run_market_analysis
+from agents.analysts.news import run_news_analysis
 
 def _trigger_market_analyst(structured_request: dict) -> str:
-    """
-    Sends the request to the Quantitative Market Analyst.
-    (Currently returning mock data until market.py is built)
-    """
-    tickers = ", ".join(structured_request.get("tickers", []))
-    print(f"   -> [A2A] Delegating to Market Analyst for: {tickers}")
-    return f"MARKET DATA: {tickers} are currently trading near their 30-day moving averages. Volatility is moderate."
+    print(f"   -> [A2A] Delegating to Market Analyst...")
+    return run_market_analysis(structured_request)
 
 def _trigger_news_analyst(structured_request: dict) -> str:
-    """
-    Sends the request to the Qualitative News Analyst.
-    (Currently returning mock data until news.py is built)
-    """
-    tickers = ", ".join(structured_request.get("tickers", []))
-    print(f"   -> [A2A] Delegating to News Analyst for: {tickers}")
-    return f"NEWS DATA: Recent press releases for {tickers} indicate upcoming product launches. Sentiment is generally bullish."
+    print(f"   -> [A2A] Delegating to News Analyst...")
+    return run_news_analysis(structured_request)
 
 # -------------------------------------------------------------------
 # Lead Analyst Core Logic
