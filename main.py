@@ -4,14 +4,13 @@ import time
 # Import the voice modules
 from voice.speech_to_text import record_audio, transcribe_with_elevenlabs
 
-# Import the orchestrators and analysts
+# Import the orchestrators (Note: Analysts are now handled inside Main Support)
 from agents.orchestrators.request_type import parse_user_request
-from agents.analysts.lead_analyst import execute_lead_analyst
 from agents.orchestrators.main_support import generate_final_response
 
 def run_full_pipeline():
     """
-    Executes the complete AaaS Data Flow Lifecycle.
+    Executes the complete AaaS Data Flow Lifecycle with Risk Management.
     """
     print("\n" + "="*60)
     print("🚀 AaaS Platform: Full Multi-Agent Pipeline Initiated")
@@ -33,16 +32,12 @@ def run_full_pipeline():
     structured_request = parse_user_request(transcribed_text)
     print("📦 Payload Generated:", json.dumps(structured_request, indent=2))
     
-    # --- STEP 3: Delegation & Synthesis (Lead Analyst) ---
-    print("\n📊 [Analytical Layer] Swarm activated...")
-    # The Lead Analyst triggers the mock Market/News agents internally
-    analytical_report = execute_lead_analyst(structured_request)
-    
-    # --- STEP 4: Output Delivery (Main Support Agent) ---
-    print("\n💬 [Orchestration Layer] Formatting final delivery...")
+    # --- STEP 3 & 4: Final Orchestration & Delivery ---
+    # Main Support now internally calls Lead Analyst and Risk Manager
+    print("\n💬 [Orchestration Layer] Main Support Agent activated...")
     final_user_response = generate_final_response(
         user_query=transcribed_text, 
-        analytical_report=analytical_report
+        structured_request=structured_request 
     )
     
     print("\n" + "="*60)

@@ -1,18 +1,12 @@
-from google.adk.agents import Agent, AgentCard
+from google.adk.agents import LlmAgent
 import sys
 import os
 
+# Add parent directory to path for local imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from local_llama import query_local_llama
 
-# 1. Define Capability Card using the AgentCard class
-market_card = AgentCard(
-    name="Market Analyst",
-    description="Specialist in quantitative market data, ticker prices, and stock metrics.",
-    tags=["Finance", "Stock Market", "Quantitative"]
-)
-
-# 2. Define the Agent Logic
+# 1. Define the Agent Logic (AgentCard is not needed for this implementation)
 market_analyst_agent = LlmAgent(
     name="market_analyst",
     description="A quantitative specialist that queries market databases.",

@@ -1,48 +1,62 @@
 import sys
 import os
 
-# Ensure the parent directory is in the path to import local_llama
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from local_llama import query_local_llama
+# Adjust paths to allow imports from sibling packages (analysts and risk)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+agents_root = os.path.dirname(current_dir)
+sys.path.append(agents_root)
 
-def generate_final_response(user_query: str, analytical_report: str) -> str:
+from local_llama import query_local_llama
+from analysts.lead_analyst import execute_lead_analyst
+from risk.risk_manager import analyze_risks
+
+def generate_final_response(user_query: str, structured_request: dict) -> str:
     """
-    Takes the structured report from the analytical swarm and formats it into
-    a conversational, natural language response for the end-user.
+    Master Orchestration: 
+    1. Queries Analytics (Lead Analyst)
+    2. Queries Risk Manager using the Analytical Report
+    3. Synthesizes both into a final user response.
     """
-    print("\n🎧 Main Support Agent: Receiving data. Drafting final response...")
+    print("\n🎧 Main Support Agent: Orchestrating full-stack analysis...")
+    
+    # --- STEP A: Query Analytics ---
+    analytical_report = execute_lead_analyst(structured_request)
+    
+    # --- STEP B: Query Risk Manager with the results ---
+    risk_report = analyze_risks(analytical_report)
+    
+    # --- STEP C: Final Delivery Synthesis ---
+    print("🎧 Main Support Agent: Synthesizing final response for the user...")
     
     system_prompt = """
-    You are the Main Support Agent for an elite B2B Agent-as-a-Service financial platform.
-    Your role is to be the polished, professional face of the platform.
-    You will be given the user's original spoken query and a synthesized analytical report from your Lead Analyst.
+    You are the polished, professional face of an elite financial platform.
+    You will be given:
+    1. The user's original query.
+    2. A synthesized analytical report from the Lead Analyst.
+    3. A safety/risk assessment from the Risk Manager.
     
-    Your task:
-    1. Acknowledge the user's original query directly.
-    2. Present the findings from the analytical report in a clear, conversational, and highly professional manner.
-    3. DO NOT invent or assume any data. Rely STRICTLY on the facts provided in the analytical report.
-    4. Conclude by asking if they need further analysis on these assets or others.
+    Your Task:
+    - Acknowledge the query directly.
+    - Present the analytical findings clearly.
+    - Transparently integrate the Risk Manager's warnings.
+    - Do not invent data; rely on the provided reports.
+    - Conclude with a balanced summary (e.g., 'While the outlook is bullish, please note the liquidity concerns...').
     """
     
     compilation_prompt = f"""
-    User's Original Query: "{user_query}"
+    User Query: "{user_query}"
     
-    --- SYNTHESIZED ANALYTICAL REPORT ---
+    --- ANALYTICAL FINDINGS ---
     {analytical_report}
-    -------------------------------------
     
-    Draft the final response to the user:
+    --- RISK ASSESSMENT ---
+    {risk_report}
+    ---------------------------
+    
+    Draft the final natural language response:
     """
 
-    final_response = query_local_llama(
+    return query_local_llama(
         prompt=compilation_prompt,
         system_message=system_prompt
     )
-    
-    return final_response
-
-# Local Test
-if __name__ == "__main__":
-    mock_query = "What's going on with Apple stock today?"
-    mock_report = "Market Data: AAPL is currently trading at $173.50, slightly above its 30-day moving average. News Data: Bullish sentiment following rumors of a new AI hardware integration."
-    print(generate_final_response(mock_query, mock_report))
