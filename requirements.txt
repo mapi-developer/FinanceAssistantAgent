@@ -1,0 +1,5 @@
+openai
+sounddvice
+scipy
+requests
+python-dotenv
