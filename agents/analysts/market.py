@@ -1,6 +1,4 @@
-from google.adk.agents import LlmAgent
-# Updated import for agent card functionality
-from google.adk.agents import AgentCard 
+from google.adk.agents import Agent, AgentCard
 import sys
 import os
 
