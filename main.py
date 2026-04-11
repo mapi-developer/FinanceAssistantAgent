@@ -4,49 +4,55 @@ import time
 # Import the voice modules
 from voice.speech_to_text import record_audio, transcribe_with_elevenlabs
 
-# Import the agent orchestrator
+# Import the orchestrators and analysts
 from agents.orchestrators.request_type import parse_user_request
+from agents.analysts.lead_analyst import execute_lead_analyst
+from agents.orchestrators.main_support import generate_final_response
 
-def process_voice_query():
+def run_full_pipeline():
     """
-    End-to-end pipeline: Captures voice, transcribes it, and routes it to the local LLM for intent parsing.
+    Executes the complete AaaS Data Flow Lifecycle.
     """
-    print("\n" + "="*50)
-    print("🚀 AaaS Platform: Voice-to-Agent Pipeline Started")
-    print("="*50 + "\n")
+    print("\n" + "="*60)
+    print("🚀 AaaS Platform: Full Multi-Agent Pipeline Initiated")
+    print("="*60 + "\n")
 
-    # Step 1: Capture the user's voice
-    # We'll use 6 seconds to give you enough time to ask a full financial question
+    # --- STEP 1: Input Reception & Voice Processing ---
     audio_filepath = record_audio(duration=6)
-    
-    # Step 2: Transcribe using ElevenLabs
     transcribed_text = transcribe_with_elevenlabs(audio_filepath)
     
-    # Check for basic transcription errors before passing to the LLM
     if transcribed_text.startswith("Failed") or transcribed_text.startswith("Error"):
         print(f"\n❌ Transcription Failed: {transcribed_text}")
         return
 
-    print("\n🗣️ You said:")
+    print("\n🗣️ User Input Received:")
     print(f"\"{transcribed_text}\"\n")
     
-    # Step 3: Pass the transcribed text to the Request Type Agent
-    print("🧠 Routing to Request Type Agent (Local Llama 3)...")
-    start_time = time.time()
-    
+    # --- STEP 2: Routing (Request Type Agent) ---
+    print("🧠 [Orchestration Layer] Parsing intent...")
     structured_request = parse_user_request(transcribed_text)
+    print("📦 Payload Generated:", json.dumps(structured_request, indent=2))
     
-    execution_time = round(time.time() - start_time, 2)
-
-    # Step 4: Display the final structured output
-    print(f"✅ Intent parsed in {execution_time} seconds.\n")
-    print("📦 Final JSON Payload for Analytical Swarm:")
-    print(json.dumps(structured_request, indent=4))
-    print("\n" + "="*50 + "\n")
+    # --- STEP 3: Delegation & Synthesis (Lead Analyst) ---
+    print("\n📊 [Analytical Layer] Swarm activated...")
+    # The Lead Analyst triggers the mock Market/News agents internally
+    analytical_report = execute_lead_analyst(structured_request)
+    
+    # --- STEP 4: Output Delivery (Main Support Agent) ---
+    print("\n💬 [Orchestration Layer] Formatting final delivery...")
+    final_user_response = generate_final_response(
+        user_query=transcribed_text, 
+        analytical_report=analytical_report
+    )
+    
+    print("\n" + "="*60)
+    print("✨ FINAL AGENT RESPONSE ✨")
+    print("="*60)
+    print(final_user_response)
+    print("\n" + "="*60 + "\n")
 
 if __name__ == "__main__":
     try:
-        # Run the pipeline once for testing
-        process_voice_query()
+        run_full_pipeline()
     except KeyboardInterrupt:
         print("\nPipeline stopped by user.")
