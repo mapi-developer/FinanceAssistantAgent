@@ -28,6 +28,7 @@ def record_audio(duration: int = 5) -> str:
     write(TEMP_FILENAME, SAMPLE_RATE, audio_data)
     return TEMP_FILENAME
 
+
 def transcribe_with_elevenlabs(filepath: str) -> str:
     """
     Sends the recorded WAV file to ElevenLabs STT API for transcription.
@@ -35,29 +36,33 @@ def transcribe_with_elevenlabs(filepath: str) -> str:
     if not ELEVENLABS_API_KEY:
         return "Error: ELEVENLABS_API_KEY is not set in the .env file."
 
-    # ElevenLabs Speech-to-Text Endpoint 
-    # (Note: API endpoint structures may vary based on your specific ElevenLabs tier)
     url = "https://api.elevenlabs.io/v1/speech-to-text"
     
     headers = {
         "xi-api-key": ELEVENLABS_API_KEY
     }
     
+    # NEW: ElevenLabs requires specifying the exact transcription model
+    data = {
+        "model_id": "scribe_v2" 
+    }
+    
     try:
         with open(filepath, "rb") as audio_file:
+            # We now pass both 'data' and 'files'
             files = {"file": audio_file}
             print("⏳ Sending to ElevenLabs for transcription...")
-            response = requests.post(url, headers=headers, files=files)
+            response = requests.post(url, headers=headers, data=data, files=files)
             
         response.raise_for_status()
         
-        # Clean up the temporary file after a successful send
         os.remove(filepath)
         
-        # Extract the transcribed text
-        data = response.json()
-        return data.get("text", "No transcription returned.")
+        response_data = response.json()
+        return response_data.get("text", "No transcription returned.")
         
+    except requests.exceptions.HTTPError as err:
+        return f"HTTP Error: {err}\nResponse text: {response.text}"
     except Exception as e:
         return f"Failed to transcribe audio: {str(e)}"
 
