@@ -1,6 +1,6 @@
-from local_llama import query_local_llama
-from analysts.lead_analyst import execute_lead_analyst
-from risk.risk_manager import analyze_risks
+from agents.local_llama import query_local_llama
+from agents.analysts.lead_analyst import execute_lead_analyst
+from agents.risk.risk_manager import analyze_risks
 
 def generate_final_response(user_query: str, structured_request: dict) -> str:
     """

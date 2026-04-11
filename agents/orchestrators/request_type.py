@@ -1,10 +1,5 @@
 import json
-import sys
-import os
-
-# Ensure the parent directory is in the path so we can import local_llama
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from local_llama import query_local_llama
+from agents.local_llama import query_local_llama
 
 def parse_user_request(user_input: str) -> dict:
     """

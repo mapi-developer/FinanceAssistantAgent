@@ -1,14 +1,5 @@
 import json
-import sys
-import os
-
-# Ensure the parent directory is in the path to import local_llama
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from local_llama import query_local_llama
-
-# -------------------------------------------------------------------
-# A2A (Agent-to-Agent) Delegation Stubs
-# -------------------------------------------------------------------
+from agents.local_llama import query_local_llama
 from agents.analysts.market import run_market_analysis
 from agents.analysts.news import run_news_analysis
 from agents.analysts.windsor_analyst import run_windsor_analysis
