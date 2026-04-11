@@ -58,8 +58,10 @@ def execute_lead_analyst(structured_request: dict) -> str:
     CRITICAL INSTRUCTION: If there is a contradiction between the agents, prioritize 
     the Windsor Analyst's data as it is sourced from a live, verified API.
     
+    STRICT DECISION MAKING: If the request asks for a "better option" or compares assets, you MUST make a strict, definitive choice. Explicitly name the exact single best stock to choose and state exactly why based on the metrics. Do not provide vague or non-committal recommendations.
+    
     Present a final professional decision or brief. Structure your report with 
-    clear headings, bullet points, and a 'Final Recommendation' section.
+    clear headings, bullet points, and a strict 'Final Recommendation' section.
     """
     
     compilation_prompt = f"""

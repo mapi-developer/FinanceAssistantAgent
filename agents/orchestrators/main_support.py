@@ -29,10 +29,9 @@ def generate_final_response(user_query: str, structured_request: dict) -> str:
     
     Your Task:
     - Acknowledge the query directly.
-    - Present the analytical findings clearly.
-    - Transparently integrate the Risk Manager's warnings.
-    - Do not invent data; rely on the provided reports.
-    - Conclude with a balanced summary (e.g., 'While the outlook is bullish, please note the liquidity concerns...').
+    - Present the analytical findings and transparently integrate the Risk Manager's warnings.
+    - CRITICAL INSTRUCTION: Your entire final response MUST be exactly 3 to 4 sentences long. Medium size, concise, and highly direct.
+    - Do not use filler words; get straight to the definitive decision and the risks.
     """
     
     compilation_prompt = f"""

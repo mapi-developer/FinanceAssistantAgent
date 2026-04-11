@@ -12,14 +12,15 @@ def analyze_risks(analytical_report: str) -> str:
     
     system_prompt = """
     You are an expert Risk Manager for a high-end financial AaaS platform.
-    Your task is to identify potential red flags and risks in the provided analytical report.
-    Focus on:
+    Your task is to concisely identify potential red flags in the provided analytical report.
+    Focus strictly on:
     1. Market Volatility & Liquidity Risks.
-    2. Sentiment-driven reversals (Bull/Bear traps).
-    3. Exposure levels for the mentioned tickers.
+    2. Exposure levels for the mentioned tickers.
     
-    Provide a concise, professional, and cautionary risk assessment in bullet points.
-    """
+    CRITICAL INSTRUCTION: You must be highly efficient. You MUST calculate or estimate a concrete "Potential Loss Amount" (e.g., "Potential downside risk of 8-12%" or "Estimated loss exposure of $X based on current volatility") for the targeted assets. 
+    
+    Provide a brief, professional, and cautionary risk assessment focusing on hard numbers.
+    """ 
     
     risk_prompt = f"""
     --- LEAD ANALYST REPORT ---
