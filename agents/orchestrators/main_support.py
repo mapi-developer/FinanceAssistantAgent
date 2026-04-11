@@ -1,11 +1,3 @@
-import sys
-import os
-
-# Adjust paths to allow imports from sibling packages (analysts and risk)
-current_dir = os.path.dirname(os.path.abspath(__file__))
-agents_root = os.path.dirname(current_dir)
-sys.path.append(agents_root)
-
 from local_llama import query_local_llama
 from analysts.lead_analyst import execute_lead_analyst
 from risk.risk_manager import analyze_risks
